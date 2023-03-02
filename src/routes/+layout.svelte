@@ -2,6 +2,8 @@
 	import { page } from '$app/stores';
 	import type { Session } from '@auth/core/types';
 	import { onMount } from 'svelte';
+	import { signIn } from '@auth/sveltekit/client';
+	import { invoke } from '@tauri-apps/api/tauri';
 
 	type Notification = {
 		repository: {
@@ -29,7 +31,15 @@
 		});
 		const data = await response.json();
 		notifications = data;
+
+		document.addEventListener('readystatechange', async (event) => {
+			await invoke('github_auth_ready');
+		});
 	});
+
+	async function signInToGithub() {
+		await invoke('github_auth_flow');
+	}
 </script>
 
 <div>
@@ -46,6 +56,7 @@
 					</span>
 					<a href="/auth/signout" class="button" data-sveltekit-preload-data="off">Sign out</a>
 				{:else}
+					<button on:click={signInToGithub}>signin 2</button>
 					<span class="notSignedInText">You are not signed in</span>
 					<a href="/auth/signin" class="buttonPrimary" data-sveltekit-preload-data="off">Sign in</a>
 				{/if}
