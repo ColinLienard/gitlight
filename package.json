@@ -20,7 +20,7 @@
 		"@tauri-apps/api": "^1.2.0"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-vercel": "^2.3.1",
+		"@sveltejs/adapter-static": "^2.0.1",
 		"@sveltejs/kit": "^1.11.0",
 		"@tauri-apps/cli": "^1.2.3",
 		"@typescript-eslint/eslint-plugin": "^5.54.1",

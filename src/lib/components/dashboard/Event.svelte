@@ -1,13 +1,38 @@
 <script lang="ts">
 	import { getHex } from '~/lib/helpers';
-	import { Check, ExternalLink, Pin } from '~/lib/icons';
+	import { Check, ExternalLink, Mail, Pin, Unpin } from '~/lib/icons';
 	import type { TEvent } from '~/lib/types';
 	import { Button, Tooltip } from '~/lib/components';
+	import { githubEvents } from '~/lib/stores';
 
 	export let data: TEvent;
 
-	let { description, icon, iconColor, repo: fullRepo, time, title, url, labels, number } = data;
+	let {
+		id,
+		read,
+		pinned,
+		description,
+		icon,
+		iconColor,
+		repo: fullRepo,
+		time,
+		title,
+		url,
+		labels,
+		number
+	} = data;
 	let [owner, repo] = fullRepo.split('/');
+
+	function handleToggle(key: 'read' | 'pinned') {
+		return () => {
+			githubEvents.update((previous) =>
+				previous.map((event) => (event.id === id ? { ...event, [key]: !event[key] } : event))
+			);
+			if (pinned) {
+				read = !read;
+			}
+		};
+	}
 </script>
 
 <div class="event">
@@ -51,16 +76,28 @@
 		</ul>
 	{/if}
 	<div class="over">
-		<Tooltip content="Mark as read" position="left">
-			<Button small><Check /></Button>
+		<Tooltip content="Mark as {read ? 'un' : ''}read" position="left">
+			<Button type={read ? 'secondary' : 'primary'} small on:click={handleToggle('read')}>
+				{#if read}
+					<Mail />
+				{:else}
+					<Check />
+				{/if}
+			</Button>
 		</Tooltip>
 		{#if url}
 			<Tooltip content="Open in GitHub" position="left">
 				<Button type="secondary" small href={url} external><ExternalLink /></Button>
 			</Tooltip>
 		{/if}
-		<Tooltip content="Pin" position="left">
-			<Button type="secondary" small><Pin /></Button>
+		<Tooltip content={pinned ? 'Unpin' : 'Pin'} position="left">
+			<Button type="secondary" small on:click={handleToggle('pinned')}>
+				{#if pinned}
+					<Unpin />
+				{:else}
+					<Pin />
+				{/if}
+			</Button>
 		</Tooltip>
 	</div>
 </div>
@@ -75,9 +112,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
-
-		// Remove width
-		width: 24rem;
 
 		&:not(&:hover) {
 			.over {

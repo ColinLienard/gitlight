@@ -7,6 +7,9 @@ export type TSession = Session & { accessToken: string };
 export type TColors = 'blue' | 'purple' | 'green' | 'red' | 'grey';
 
 export type TEvent = {
+	id: string;
+	read: boolean;
+	pinned: boolean;
 	title: string;
 	description: (
 		| {
